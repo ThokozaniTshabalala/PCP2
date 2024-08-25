@@ -85,8 +85,12 @@ public class Swimmer extends Thread {
 	public void goToStartingBlocks() throws InterruptedException {		
 		int x_st= start.getX();
 		int y_st= start.getY();
-	System.out.println("Thread "+this.ID + " has start position: " + x_st  + " " +y_st );
-	System.out.println("Thread "+this.ID + " at " + currentBlock.getX()  + " " +currentBlock.getY() );
+	//System.out.println("Thread "+this.ID + " has start position: " + x_st  + " " +y_st );
+	//System.out.println("Thread "+this.ID + " at " + currentBlock.getX()  + " " +currentBlock.getY() );
+	 //new cleart print lines
+	 System.out.println("Thread " + this.ID + " target start position: (" + x_st + ", " + y_st + ")");
+	 System.out.println("Thread " + this.ID + " current position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ")");
+
 	 while (currentBlock!=start) {
 		//	System.out.println("Thread "+this.ID + " has starting position: " + x_st  + " " +y_st );
 		//	System.out.println("Thread "+this.ID + " at position: " + currentBlock.getX()  + " " +currentBlock.getY() );
