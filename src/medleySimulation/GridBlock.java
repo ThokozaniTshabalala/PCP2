@@ -44,7 +44,7 @@ public class GridBlock {
 	
 
 	//is a bloc already occupied?
-	public  boolean occupied() {
+	public synchronized boolean occupied() {
 		if(isOccupied==-1) return false;
 		return true;
 	}
