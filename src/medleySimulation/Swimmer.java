@@ -85,8 +85,8 @@ public class Swimmer extends Thread {
 	public void goToStartingBlocks() throws InterruptedException {		
 		int x_st= start.getX();
 		int y_st= start.getY();
-	//System.out.println("Thread "+this.ID + " has start position: " + x_st  + " " +y_st );
-	// System.out.println("Thread "+this.ID + " at " + currentBlock.getX()  + " " +currentBlock.getY() );
+	System.out.println("Thread "+this.ID + " has start position: " + x_st  + " " +y_st );
+	System.out.println("Thread "+this.ID + " at " + currentBlock.getX()  + " " +currentBlock.getY() );
 	 while (currentBlock!=start) {
 		//	System.out.println("Thread "+this.ID + " has starting position: " + x_st  + " " +y_st );
 		//	System.out.println("Thread "+this.ID + " at position: " + currentBlock.getX()  + " " +currentBlock.getY() );
@@ -113,13 +113,15 @@ public class Swimmer extends Thread {
 			currentBlock=stadium.moveTowards(currentBlock,x,0,myLocation);
 			//System.out.println("Thread "+this.ID + " swimming " + currentBlock.getX()  + " " +currentBlock.getY() );
 			sleep((int) (movingSpeed*swimStroke.strokeTime)); //swim
-			System.out.println("Thread "+this.ID + " swimming  at speed" + movingSpeed );	
+			//System.out.println("Thread "+this.ID + " swimming  at speed" + movingSpeed );	
+			System.out.println("Thread " + this.ID + " swimming towards end at position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ") with speed " + movingSpeed);
 		}
 
 		while((boolean) ((currentBlock.getY())!=(StadiumGrid.start_y-1))) {
 			currentBlock=stadium.moveTowards(currentBlock,x,StadiumGrid.start_y,myLocation);
 			//System.out.println("Thread "+this.ID + " swimming " + currentBlock.getX()  + " " +currentBlock.getY() );
 			sleep((int) (movingSpeed*swimStroke.strokeTime));  //swim
+			System.out.println("Thread " + this.ID + " swimming back at position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ") with speed " + movingSpeed);
 		}
 		
 	}
