@@ -45,6 +45,8 @@ public class Swimmer extends Thread {
 	        public  Color getColour() { return colour; }
 	    }  
 	    private final SwimStroke swimStroke;
+
+		
 	
 	//Constructor
 	Swimmer( int ID, int t, PeopleLocation loc, FinishCounter f, int speed, SwimStroke s) {
@@ -87,6 +89,7 @@ public class Swimmer extends Thread {
 		int y_st= start.getY();
 	//System.out.println("Thread "+this.ID + " has start position: " + x_st  + " " +y_st );
 	//System.out.println("Thread "+this.ID + " at " + currentBlock.getX()  + " " +currentBlock.getY() );
+	 
 	 //new cleart print lines
 	 System.out.println("Thread " + this.ID + " target start position: (" + x_st + ", " + y_st + ")");
 	 System.out.println("Thread " + this.ID + " current position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ")");
@@ -141,6 +144,13 @@ public class Swimmer extends Thread {
 			sleep(movingSpeed*3);  //not rushing 
 		}
 	}
+	// WE USE THE METHOD BELOW TO CHECK IF THE ORDER IN WHICH OUR SWIMTEAM IS SORTED
+	//IS CORRECT OR NOT
+	@Override
+	public String toString() {
+    return "Swimmer " + this.ID + " with stroke " + swimStroke;
+	}
+
 	
 	public void run() {
 		try {

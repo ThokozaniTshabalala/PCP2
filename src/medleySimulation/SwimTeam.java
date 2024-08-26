@@ -2,6 +2,8 @@
 //Class to represent a swim team - which has four swimmers
 package medleySimulation;
 
+import java.util.Arrays;
+
 import medleySimulation.Swimmer.SwimStroke;
 
 public class SwimTeam extends Thread {
@@ -25,11 +27,25 @@ public class SwimTeam extends Thread {
 	      	int speed=(int)(Math.random() * (3)+30); //range of speeds 
 			swimmers[s] = new Swimmer(i,teamNo,locArr[i],finish,speed,strokes[s]); //hardcoded speed for now
 		}
+
+
+
+		
 	}
 	
 	
 	public void run() {
 		try {	
+			//Sort the array from backtroke to freestyle
+			Arrays.sort(swimmers, (a, b) -> a.getSwimStroke().compareTo(b.getSwimStroke()));
+			
+			// Print sorted swimmers
+            System.out.println("Sorted Swimmers in team " + this.teamNo +" are: ");
+            for (Swimmer swimmer : swimmers) {
+                System.out.println("In team "+this.teamNo+" "+ swimmer);
+            }
+
+
 			for(int s=0;s<sizeOfTeam; s++) { //start swimmer threads
 				swimmers[s].start();
 				
