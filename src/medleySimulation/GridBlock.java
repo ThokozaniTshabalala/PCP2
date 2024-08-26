@@ -29,10 +29,28 @@ public class GridBlock {
 	
 	
 	//Get a block
-	public  boolean get(int threadID) throws InterruptedException {
+	public synchronized boolean get(int threadID) throws InterruptedException {
 		if (isOccupied==threadID) return true; //thread Already in this block
+		//An idea why do I not make the threads to wait instead of returning false
 		if (isOccupied>=0) return false; //space is occupied
 		isOccupied= threadID;  //set ID to thread that had block
+		return true;
+	}
+
+	public boolean getEntrance(int threadID) throws InterruptedException {
+		if (isOccupied==threadID) {//thread Already in this block
+			releaseEntrance();
+			return true;} 
+
+		//An idea: why do I not make the threads to wait instead of returning false
+		if (isOccupied>=0) { //space is occupied
+			wait();
+			return false;
+	
+		} 
+		
+		isOccupied= threadID;  //set ID to thread that had block
+		releaseEntrance();
 		return true;
 	}
 		
@@ -41,6 +59,13 @@ public class GridBlock {
 	public  void release() {
 		isOccupied= -1;
 	}
+
+	public synchronized void releaseEntrance() {
+		isOccupied= -1;
+		notifyAll();
+	}
+
+
 	
 
 	//is a bloc already occupied?

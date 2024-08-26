@@ -71,9 +71,15 @@ public class StadiumGrid {
 				System.out.println("Thread " + Thread.currentThread().getId() + " attempting to enter stadium.");
 				boolean entr=entrance.get(myLocation.getID());
 				System.out.println(entr);
-				while((entrance.get(myLocation.getID()))) {
+				/**while((entrance.get(myLocation.getID()))) {
 					Thread.sleep(10);
-				} //wait at entrace until entrance is free - spinning, not good
+				} //wait at entrace until entrance is free - spinning, not good**/
+				
+				while((entrance.getEntrance(myLocation.getID()))==false) {
+					//Thread.sleep(10); //worked winderfully well
+					System.out.println("Thread " + Thread.currentThread().getId() + " waiting at the entrance.");
+        			//wait(); // Wait until notified that the entrance is free
+				}
 
 				System.out.println("Thread " + Thread.currentThread().getId() + " has entered the stadium.");
 				myLocation.setLocation(entrance);
