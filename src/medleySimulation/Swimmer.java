@@ -4,177 +4,176 @@
 package medleySimulation;
 
 import java.awt.Color;
-
 import java.util.Random;
-
-
+import java.util.concurrent.CountDownLatch;
 
 public class Swimmer extends Thread {
-	
-	public static StadiumGrid stadium; //shared 
-	private FinishCounter finish; //shared
-	
-		
-	GridBlock currentBlock;
-	private Random rand;
-	private int movingSpeed;
-	
-	private PeopleLocation myLocation;
-	private int ID; //thread ID 
-	private int team; // team ID
-	private GridBlock start;
 
-	public enum SwimStroke { 
-		Backstroke(1,2.5,Color.black),
-		Breaststroke(2,2.1,new Color(255,102,0)),
-		Butterfly(3,2.55,Color.magenta),
-		Freestyle(4,2.8,Color.red);
-	    	
-	     private final double strokeTime;
-	     private final int order; // in minutes
-	     private final Color colour;   
+    public static StadiumGrid stadium; // shared
+    private FinishCounter finish; // shared
 
-	     SwimStroke( int order, double sT, Color c) {
-	            this.strokeTime = sT;
-	            this.order = order;
-	            this.colour = c;
-	        }
-	  
-	        public int getOrder() {return order;}
+    GridBlock currentBlock;
+    private Random rand;
+    private int movingSpeed;
+    private CountDownLatch[] strokeLatches; 
+    private CountDownLatch[] swimLatches; // Added for swim race synchronization
 
-	        public  Color getColour() { return colour; }
-	    }  
-	    private final SwimStroke swimStroke;
+    private PeopleLocation myLocation;
+    private int ID; // thread ID
+    private int team; // team ID
+    private GridBlock start;
 
-		
-	
-	//Constructor
-	Swimmer( int ID, int t, PeopleLocation loc, FinishCounter f, int speed, SwimStroke s) {
-		this.swimStroke = s;
-		this.ID=ID;
-		movingSpeed=speed; //range of speeds for swimmers
-		this.myLocation = loc;
-		this.team=t;
-		start = stadium.returnStartingBlock(team);
-		finish=f;
-		rand=new Random();
-	}
-	
-	//getter
-	public   int getX() { return currentBlock.getX();}	
-	
-	//getter
-	public   int getY() {	return currentBlock.getY();	}
-	
-	//getter
-	public   int getSpeed() { return movingSpeed; }
+    public enum SwimStroke {
+        Backstroke(1, 2.5, Color.black),
+        Breaststroke(2, 2.1, new Color(255, 102, 0)),
+        Butterfly(3, 2.55, Color.magenta),
+        Freestyle(4, 2.8, Color.red);
 
-	
-	public SwimStroke getSwimStroke() {
-		return swimStroke;
-	}
+        private final double strokeTime;
+        private final int order; // in minutes
+        private final Color colour;
 
-	//!!!You do not need to change the method below!!!
-	//swimmer enters stadium area
-	public void enterStadium() throws InterruptedException {
-		currentBlock = stadium.enterStadium(myLocation);  //
-		sleep(200);  //wait a bit at door, look around
-	}
-	
-	//!!!You do not need to change the method below!!!
-	//go to the starting blocks
-	//printlns are left here for help in debugging
-	public void goToStartingBlocks() throws InterruptedException {		
-		int x_st= start.getX();
-		int y_st= start.getY();
-	//System.out.println("Thread "+this.ID + " has start position: " + x_st  + " " +y_st );
-	//System.out.println("Thread "+this.ID + " at " + currentBlock.getX()  + " " +currentBlock.getY() );
-	 
-	 //new cleart print lines
-	 System.out.println("Thread " + this.ID + " target start position: (" + x_st + ", " + y_st + ")");
-	 System.out.println("Thread " + this.ID + " current position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ")");
+        SwimStroke(int order, double sT, Color c) {
+            this.strokeTime = sT;
+            this.order = order;
+            this.colour = c;
+        }
 
-	 while (currentBlock!=start) {
-		//	System.out.println("Thread "+this.ID + " has starting position: " + x_st  + " " +y_st );
-		//	System.out.println("Thread "+this.ID + " at position: " + currentBlock.getX()  + " " +currentBlock.getY() );
-			sleep(movingSpeed*3);  //not rushing 
-			currentBlock=stadium.moveTowards(currentBlock,x_st,y_st,myLocation); //head toward starting block
-		//	System.out.println("Thread "+this.ID + " moved toward start to position: " + currentBlock.getX()  + " " +currentBlock.getY() );
-		}
-	System.out.println("-----------Thread "+this.ID + " at start " + currentBlock.getX()  + " " +currentBlock.getY() );
-	}
-	
-	//!!!You do not need to change the method below!!!
-	//dive in to the pool
-	private void dive() throws InterruptedException {
-		int x= currentBlock.getX();
-		int y= currentBlock.getY();
-		currentBlock=stadium.jumpTo(currentBlock,x,y-2,myLocation);
-	}
-	
-	//!!!You do not need to change the method below!!!
-	//swim there and back
-	private void swimRace() throws InterruptedException {
-		int x= currentBlock.getX();
-		while((boolean) ((currentBlock.getY())!=0)) {
-			currentBlock=stadium.moveTowards(currentBlock,x,0,myLocation);
-			//System.out.println("Thread "+this.ID + " swimming " + currentBlock.getX()  + " " +currentBlock.getY() );
-			sleep((int) (movingSpeed*swimStroke.strokeTime)); //swim
-			//System.out.println("Thread "+this.ID + " swimming  at speed" + movingSpeed );	
-			System.out.println("Thread " + this.ID + " swimming towards end at position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ") with speed " + movingSpeed);
-		}
+        public int getOrder() { return order; }
+        public Color getColour() { return colour; }
+    }
 
-		while((boolean) ((currentBlock.getY())!=(StadiumGrid.start_y-1))) {
-			currentBlock=stadium.moveTowards(currentBlock,x,StadiumGrid.start_y,myLocation);
-			//System.out.println("Thread "+this.ID + " swimming " + currentBlock.getX()  + " " +currentBlock.getY() );
-			sleep((int) (movingSpeed*swimStroke.strokeTime));  //swim
-			System.out.println("Thread " + this.ID + " swimming back at position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ") with speed " + movingSpeed);
-		}
-		
-	}
-	
-	//!!!You do not need to change the method below!!!
-	//after finished the race
-	public void exitPool() throws InterruptedException {		
-		int bench=stadium.getMaxY()-swimStroke.getOrder(); 			 //they line up
-		int lane = currentBlock.getX()+1;//slightly offset
-		currentBlock=stadium.moveTowards(currentBlock,lane,currentBlock.getY(),myLocation);
-	   while (currentBlock.getY()!=bench) {
-		 	currentBlock=stadium.moveTowards(currentBlock,lane,bench,myLocation);
-			sleep(movingSpeed*3);  //not rushing 
-		}
-	}
-	// WE USE THE METHOD BELOW TO CHECK IF THE ORDER IN WHICH OUR SWIMTEAM IS SORTED
-	//IS CORRECT OR NOT
-	@Override
-	public String toString() {
-    return "Swimmer " + this.ID + " with stroke " + swimStroke;
-	}
+    private final SwimStroke swimStroke;
 
-	
-	public void run() {
-		try {
-			
-			//Swimmer arrives
-			sleep(movingSpeed+(rand.nextInt(10))); //arriving takes a while
-			myLocation.setArrived();
-			enterStadium();	
-			
-			goToStartingBlocks();
-								
-			dive(); 
-				
-			swimRace();
-			if(swimStroke.order==4) {
-				finish.finishRace(ID, team); // fnishline
-			}
-			else {
-				//System.out.println("Thread "+this.ID + " done " + currentBlock.getX()  + " " +currentBlock.getY() );			
-				exitPool();//if not last swimmer leave pool
-			}
-			
-		} catch (InterruptedException e1) {  //do nothing
-		} 
-	}
-	
+    // Constructor
+    Swimmer(int ID, int t, PeopleLocation loc, FinishCounter f, int speed, SwimStroke s, CountDownLatch[] strokeLatches, CountDownLatch[] swimLatches) {
+        this.swimStroke = s;
+        this.ID = ID;
+        this.movingSpeed = speed; // range of speeds for swimmers
+        this.myLocation = loc;
+        this.team = t;
+        start = stadium.returnStartingBlock(team);
+        finish = f;
+        rand = new Random();
+        this.strokeLatches = strokeLatches;
+        this.swimLatches = swimLatches;
+    }
+
+    // getter
+    public int getX() { return currentBlock.getX(); }
+
+    // getter
+    public int getY() { return currentBlock.getY(); }
+
+    // getter
+    public int getSpeed() { return movingSpeed; }
+
+    public SwimStroke getSwimStroke() {
+        return swimStroke;
+    }
+
+    // Swimmer enters stadium
+    public void enterStadium() throws InterruptedException {
+        // Wait for previous strokes to enter
+        for (SwimStroke stroke : SwimStroke.values()) {
+            if (swimStroke.ordinal() > stroke.ordinal()) {
+                System.out.println("Swimmer " + this.ID + " from team " + team + " with stroke " + swimStroke + " waiting for stroke " + stroke + " to enter.");
+                strokeLatches[stroke.ordinal()].await();
+            }
+        }
+        // Enter the stadium
+        currentBlock = stadium.enterStadium(myLocation);
+        sleep(200); // wait a bit at the door
+        // Signal that this swimmer has entered
+        strokeLatches[swimStroke.ordinal()].countDown();
+        // Print out information about the swimmer entering the stadium
+        System.out.println("Swimmer " + this.ID + " from team " + team + " with stroke " + swimStroke + " has entered the stadium.");
+    }
+
+    // Go to the starting blocks
+    public void goToStartingBlocks() throws InterruptedException {
+        int x_st = start.getX();
+        int y_st = start.getY();
+        System.out.println("Thread " + this.ID + " target start position: (" + x_st + ", " + y_st + ")");
+        System.out.println("Thread " + this.ID + " current position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ")");
+
+        while (currentBlock != start) {
+            sleep(movingSpeed * 3); // not rushing 
+            currentBlock = stadium.moveTowards(currentBlock, x_st, y_st, myLocation); // head toward starting block
+        }
+        System.out.println("-----------Thread " + this.ID + " at start " + currentBlock.getX() + " " + currentBlock.getY());
+    }
+
+    // Dive into the pool
+    private void dive() throws InterruptedException {
+        int x = currentBlock.getX();
+        int y = currentBlock.getY();
+        currentBlock = stadium.jumpTo(currentBlock, x, y - 2, myLocation);
+    }
+
+    // Swim the race
+    private void swimRace() throws InterruptedException {
+        int x = currentBlock.getX();
+        while (currentBlock.getY() != 0) {
+            currentBlock = stadium.moveTowards(currentBlock, x, 0, myLocation);
+            sleep((int) (movingSpeed * swimStroke.strokeTime)); // swim
+            System.out.println("Thread " + this.ID + " swimming towards end at position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ") with speed " + movingSpeed);
+        }
+
+        while (currentBlock.getY() != (StadiumGrid.start_y - 1)) {
+            currentBlock = stadium.moveTowards(currentBlock, x, StadiumGrid.start_y, myLocation);
+            sleep((int) (movingSpeed * swimStroke.strokeTime)); // swim
+            System.out.println("Thread " + this.ID + " swimming back at position: (" + currentBlock.getX() + ", " + currentBlock.getY() + ") with speed " + movingSpeed);
+        }
+
+        // Signal that this swimmer has finished their lap
+        swimLatches[swimStroke.ordinal()].countDown();
+    }
+
+    // Exit the pool
+    public void exitPool() throws InterruptedException {
+        int bench = stadium.getMaxY() - swimStroke.getOrder(); // they line up
+        int lane = currentBlock.getX() + 1; // slightly offset
+        currentBlock = stadium.moveTowards(currentBlock, lane, currentBlock.getY(), myLocation);
+        while (currentBlock.getY() != bench) {
+            currentBlock = stadium.moveTowards(currentBlock, lane, bench, myLocation);
+            sleep(movingSpeed * 3); // not rushing 
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Swimmer " + this.ID + " with stroke " + swimStroke;
+    }
+
+    public void run() {
+        try {
+            // Swimmer arrives
+            sleep(movingSpeed + (rand.nextInt(10))); // arriving takes a while
+            myLocation.setArrived();
+            enterStadium();
+
+            goToStartingBlocks();
+
+            dive();
+
+            // Wait for all previous strokes to finish their race
+            for (SwimStroke stroke : SwimStroke.values()) {
+                if (swimStroke.ordinal() > stroke.ordinal()) {
+                    System.out.println("Swimmer " + this.ID + " from team " + team + " with stroke " + swimStroke + " waiting for stroke " + stroke + " to finish their race.");
+                    swimLatches[stroke.ordinal()].await();
+                }
+            }
+
+            swimRace();
+            if (swimStroke.order == 4) {
+                finish.finishRace(ID, team); // finish line
+            } else {
+                exitPool(); // if not last swimmer leave pool
+            }
+
+        } catch (InterruptedException e1) { // do nothing
+        }
+    }
 }
+

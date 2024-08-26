@@ -68,9 +68,9 @@ public class StadiumGrid {
 	
 	//a person enters the stadium
 	public synchronized GridBlock enterStadium(PeopleLocation myLocation) throws InterruptedException  {
-				System.out.println("Thread " + Thread.currentThread().getId() + " attempting to enter stadium.");
-				boolean entr=entrance.get(myLocation.getID());
-				System.out.println(entr);
+				//System.out.println("Thread " + Thread.currentThread().getId() + " attempting to enter stadium.");
+				//boolean entr=entrance.get(myLocation.getID());
+				//System.out.println(entr);
 				/**while((entrance.get(myLocation.getID()))) {
 					Thread.sleep(10);
 				} //wait at entrace until entrance is free - spinning, not good**/
@@ -81,7 +81,7 @@ public class StadiumGrid {
         			//wait(); // Wait until notified that the entrance is free
 				}
 
-				System.out.println("Thread " + Thread.currentThread().getId() + " has entered the stadium.");
+				//System.out.println("Thread " + Thread.currentThread().getId() + " has entered the stadium.");
 				myLocation.setLocation(entrance);
 				myLocation.setInStadium(true);
 				return entrance;
