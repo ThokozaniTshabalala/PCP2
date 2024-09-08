@@ -1,5 +1,3 @@
-//M. M. Kuttel 2024 mkuttel@gmail.com
-//Class to represent a swim team - which has four swimmers
 package medleySimulation;
 
 import java.util.Arrays;
@@ -15,10 +13,10 @@ public class SwimTeam extends Thread {
 
     public static final int sizeOfTeam = 4;
     private CountDownLatch[] strokeLatches;
-    private CountDownLatch[] swimLatches;
-    private CountDownLatch swimLatch;
+    private CountDownLatch[] swimLatches; // Added for swim race synchronization
+    private CountDownLatch swimLatch; // Added for swim synchronization
 
-    public SwimTeam(int ID, FinishCounter finish, PeopleLocation[] locArr) {
+    SwimTeam(int ID, FinishCounter finish, PeopleLocation[] locArr) {
         this.teamNo = ID;
 
         swimmers = new Swimmer[sizeOfTeam];
@@ -36,30 +34,39 @@ public class SwimTeam extends Thread {
             swimLatches[stroke.ordinal()] = new CountDownLatch(swimmersForStroke);
         }
 
-        for (int i = teamNo * sizeOfTeam, s = 0; i < ((teamNo + 1) * sizeOfTeam); i++, s++) {
+        for (int i = teamNo * sizeOfTeam, s = 0; i < ((teamNo + 1) * sizeOfTeam); i++, s++) { // initialize swimmers in team
             locArr[i] = new PeopleLocation(i, strokes[s].getColour());
             int speed = (int) (Math.random() * (3) + 30); // range of speeds
             swimmers[s] = new Swimmer(i, teamNo, locArr[i], finish, speed, strokes[s], strokeLatches, swimLatches, swimLatch);
         }
     }
 
-    @Override
     public void run() {
         try {
             // Sort the array from backstroke to freestyle
             Arrays.sort(swimmers, (a, b) -> a.getSwimStroke().compareTo(b.getSwimStroke()));
 
-            // Start swimmer threads
+            // Print sorted swimmers
+            /*
+            System.out.println("Sorted Swimmers in team " + this.teamNo + " are: ");
             for (Swimmer swimmer : swimmers) {
+                System.out.println("In team " + this.teamNo + " " + swimmer);
+            }
+            */
+
+            for (Swimmer swimmer : swimmers) { // start swimmer threads
                 swimmer.start();
             }
 
-            // Wait for all swimmers to finish
             for (Swimmer swimmer : swimmers) {
-                swimmer.join();
+                swimmer.join(); // wait for all swimmers to finish
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 }
+
+
+	
+
